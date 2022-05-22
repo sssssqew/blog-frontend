@@ -5,11 +5,16 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { BrowserRouter } from 'react-router-dom';
 import { Provider } from 'react-redux'
-import { legacy_createStore as createStore } from 'redux';
+import { legacy_createStore as createStore, applyMiddleware } from 'redux';
 import { composeWithDevTools } from 'redux-devtools-extension'
-import rootReducer from './modules';
+import createSagaMiddleware from '@redux-saga/core';
+import rootReducer, { rootSaga } from './modules';
 
-const store = createStore(rootReducer, composeWithDevTools())
+const sagaMiddleware = createSagaMiddleware() 
+
+const store = createStore(rootReducer, composeWithDevTools(applyMiddleware(sagaMiddleware)))
+
+sagaMiddleware.run(rootSaga) // 사용자 액션이 들어올때마다 처리함 (사용자 액션을 기다림)
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
