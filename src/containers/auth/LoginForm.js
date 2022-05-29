@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { withRouter } from "react-router-dom";
 import { changeField, initializeForm, login } from "../../modules/auth";
@@ -6,6 +6,8 @@ import AuthForm from "../../components/auth/AuthForm";
 import { check } from '../../modules/user'
 
 const LoginForm = ({ history }) => {
+  const [error, setError] = useState(null)
+
   const dispatch = useDispatch()
   const { form, auth, authError, user } = useSelector(({ auth, user })=> ({
     form: auth.login, // form : { username: '', password: '' }
@@ -34,6 +36,7 @@ const LoginForm = ({ history }) => {
     if(authError){
       console.log('오류 발생')
       console.log(authError)
+      setError('로그인 실패')
       return 
     }
     if(auth){
@@ -46,10 +49,15 @@ const LoginForm = ({ history }) => {
   useEffect(()=>{
     if(user){
       history.push('/')
+      try{ // 로그인 정보를 로컬 스토리지에 저장하기 
+        localStorage.setItem('user', JSON.stringify(user))
+      }catch(e){
+        console.log('local storage is not working !')
+      }
     }
   }, [history, user])
   return (
-    <AuthForm type='login' form={form} onChange={onChange} onSubmit={onSubmit}/>
+    <AuthForm type='login' form={form} onChange={onChange} onSubmit={onSubmit} error={error}/>
   )
 }
 
